@@ -51,15 +51,26 @@ function RGBtoHSV($R, $G, $B)    // RGB values:    0-255, 0-255, 0-255
 }
 
 $file = file_get_contents(__DIR__ . '/list.html');
-$line = [];
+$lines = [];
 foreach (explode("\n", $file) as $line) {
+    if ( ! strpos($line, '#')) {
+        continue;
+    }
     $hex = explode('"', explode('#', $line)[1])[0];
-    // TODO rgb from hex
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
     [$hue, $sat, $val] = RGBtoHSV($r, $g, $b);
-    $lines["$hue-$sat-$val"] = $line;
+    $key = sprintf("%07.03f-%07.03f-%07.03f", $hue, $sat, $val);
+    //if (isset($lines[$key])) {
+    //    echo "$line\n";
+    //    echo " -->> DUPLICATE: ";
+    //}
+    //echo "$key\n";
+    $lines[$key] = $line;
 }
-ksort($line);
-foreach ($lines as $line) {
+ksort($lines);
+foreach ($lines as $key => $line) {
     echo "$line\n";
 }
 
