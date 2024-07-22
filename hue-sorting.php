@@ -1,5 +1,14 @@
 <?php
 
+// function heavily based on https://stackoverflow.com/a/13887939
+// shout-out to https://stackoverflow.com/users/629493/unsigned
+// most of my changes are just handling edge cases better,
+// such as returning null instead of zero for grayscale.
+
+// Licensed under the terms of the BSD License.
+// (Basically, this means you can do whatever you like with it,
+//   but if you just copy and paste my code into your app, you
+//   should give me a shout-out/credit :)
 function RGBtoHSV($R, $G, $B)    // RGB values:    0-255, 0-255, 0-255
 {                                // HSV values:    0-360, 0-100, 0-100
     // Convert the RGB byte-values to percentages
