@@ -1,16 +1,38 @@
 <!DOCTYPE html>
 <head>
 <style>
+    html, body { margin: 0; }
+    .navbar { background-color: #01153e; color: #ffffff; }
+    .wrap { margin: .5em auto; max-width: 1400px; }
+    nav, nav ul { display: flex; justify-content: space-between; padding: .5em; margin: 0; }
+    nav { max-width: 1400px; margin: auto; }
+    h1, h2, h3 { display: inline-block; padding: .5em .1em; margin: 0; }
+    nav li { list-style: none; padding: .5em; margin: 0; }
+    nav a { color: #00ffff; }
     .contain { display: flex; flex-wrap: wrap; text-align: center; justify-content: center; }
-	.box { width: 125px; padding-bottom: 20px; }
-    .square { border: 1px solid black; margin: 5px; width: 115px; height: 50px; }
+	.box { width: 98px; padding-bottom: 20px; }
+    .square { border: 1px solid black; margin: 5px; width: 88px; height: 50px; }
+
+    @media screen and (max-width: 999px) {
+        nav { flex-direction: column; }
+        nav ul { justify-content: space-evenly; }
+        .box { width: 75px; }
+        .square { width: 65px; }
+    }
 </style>
 </head>
 <body>
-<ul><li><a href="/">Colors in Rainbow order</a></li><li><a href="/index-name-order.html">Colors in Name order</a></li></ul>
-<h2>Colors, a subset of <a href="https://xkcd.com/color/rgb">xkcd.com/color/rgb</a>, specifically every distinct (non-gross) word</h2>
-<h3>Refined into a collection like <a href="https://sashamaps.net/docs/resources/20-colors/">sashamaps.net/docs/resources/20-colors/</a></h3>
-<!-- <h4>color set in rainbow order</h4> -->
+<div class="navbar">
+    <nav>
+        <div>
+            <h1>Colors</h1>
+            <h2>a subset of <a href="https://xkcd.com/color/rgb" target="_blank">xkcd's colors</a></h2>
+            <h3>as a collection like <a href="https://sashamaps.net/docs/resources/20-colors/" target="_blank">sashamaps's colors</a></h3>
+        </div>
+        <ul><li><a href="/">List in Rainbow Order</a></li><li><a href="/index-name-order.html">List Alphabetically</a></li></ul>
+    </nav>
+</div>
+<div class="wrap">
 <div class="contain">
 <div class="box"><div class="square" style="background:#650021"></div>maroon<br><span style="font-size: 12px">(#650021)</span></div>
 <div class="box"><div class="square" style="background:#653700"></div>brown<br><span style="font-size: 12px">(#653700)</span></div>
@@ -247,6 +269,7 @@
 <div class="box"><div class="square" style="background:#20f986"></div>wintergreen<br><span style="font-size: 12px">(#20f986)</span></div>
 <div class="box"><div class="square" style="background:#a87dc2"></div>wisteria<br><span style="font-size: 12px">(#a87dc2)</span></div>
 <div class="box"><div class="square" style="background:#ffff14"></div>yellow<br><span style="font-size: 12px">(#ffff14)</span></div>
+</div>
 </div>
 </body>
 </html>
