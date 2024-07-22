@@ -3,9 +3,9 @@
 function RGBtoHSV($R, $G, $B)    // RGB values:    0-255, 0-255, 0-255
 {                                // HSV values:    0-360, 0-100, 0-100
     // Convert the RGB byte-values to percentages
-    $R = ($R / 255);
-    $G = ($G / 255);
-    $B = ($B / 255);
+    $R = ($R / 255.0);
+    $G = ($G / 255.0);
+    $B = ($B / 255.0);
 
     // Calculate a few basic values, the maximum value of R,G,B, the
     //   minimum value, and the difference of the two (chroma).
@@ -16,20 +16,21 @@ function RGBtoHSV($R, $G, $B)    // RGB values:    0-255, 0-255, 0-255
     // Value (also called Brightness) is the easiest component to calculate,
     //   and is simply the highest value among the R,G,B components.
     // We multiply by 100 to turn the decimal into a readable percent value.
-    $computedV = 100 * $maxRGB;
+    $computedV = 100.0 * $maxRGB;
 
     // Special case if hueless (equal parts RGB make black, white, or grays)
     // Note that Hue is technically undefined when chroma is zero, as
     //   attempting to calculate it would cause division by zero (see
     //   below), so most applications simply substitute a Hue of zero.
     // Saturation will always be zero in this case, see below for details.
-    if ($chroma == 0)
-        return array(0, 0, $computedV);
+    /* allow a tiny deviation of hue to be regarded as grayscale ~ABS */
+    if ($chroma <= 0.02) // grayscale +/- 1%
+        return array('null', 0, $computedV);
 
     // Saturation is also simple to compute, and is simply the chroma
     //   over the Value (or Brightness)
     // Again, multiplied by 100 to get a percentage.
-    $computedS = 100 * ($chroma / $maxRGB);
+    $computedS = 100.0 * ($chroma / $maxRGB);
 
     // Calculate Hue component
     // Hue is calculated on the "chromacity plane", which is represented
@@ -37,20 +38,23 @@ function RGBtoHSV($R, $G, $B)    // RGB values:    0-255, 0-255, 0-255
     //   the bisecting angle as a value 0 <= x < 6, that represents which
     //   portion of which sector the line falls on.
     if ($R == $minRGB)
-        $h = 3 - (($G - $B) / $chroma);
+        $h = 3.0 - (($G - $B) / $chroma);
     elseif ($B == $minRGB)
-        $h = 1 - (($R - $G) / $chroma);
+        $h = 1.0 - (($R - $G) / $chroma);
     else // $G == $minRGB
-        $h = 5 - (($B - $R) / $chroma);
+        $h = 5.0 - (($B - $R) / $chroma);
 
     // After we have the sector position, we multiply it by the size of
     //   each sector's arc (60 degrees) to obtain the angle in degrees.
-    $computedH = 60 * $h;
+    /* allow red with a tiny amount of green/blue to be regarded as red ~ABS */
+    $computedH = 60.0 * $h;
+    if ($computedH >= 359.28) // red +0.2% green/blue
+        $computedH = 0;
 
     return array($computedH, $computedS, $computedV);
 }
 
-$file = file_get_contents(__DIR__ . '/list.html');
+$file = file_get_contents(__DIR__ . '/list-by-name.html');
 $lines = [];
 foreach (explode("\n", $file) as $line) {
     if ( ! strpos($line, '#')) {
@@ -61,12 +65,13 @@ foreach (explode("\n", $file) as $line) {
     $g = hexdec(substr($hex, 2, 2));
     $b = hexdec(substr($hex, 4, 2));
     [$hue, $sat, $val] = RGBtoHSV($r, $g, $b);
-    $key = sprintf("%07.03f-%07.03f-%07.03f", $hue, $sat, $val);
-    //if (isset($lines[$key])) {
-    //    echo "$line\n";
-    //    echo " -->> DUPLICATE: ";
-    //}
-    //echo "$key\n";
+    if ($hue === 'null') {
+        // grayscale at the beginning
+        $key = sprintf("***-%03.0f-%s", 200.0-$val, $hex);
+    } else {
+        // $key = sprintf("%07.03f-%07.03f-%07.03f-%s", $hue, $sat, $val, $hex); // initial sorting, by exact hue, fallback to darkest to brightest
+        $key = sprintf("%03.0f-%03.0f-%s", $hue/7.2, 300.0-$val-$sat, $hex); // group by hue +/- 2%, order groups by brightest to darkest
+    }
     $lines[$key] = $line;
 }
 ksort($lines);
